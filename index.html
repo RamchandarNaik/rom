@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ramchandar Naik | Portfolio</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Inline styles added specifically for the social feed to look like modern status/tweet cards -->
+    <style>
+        .feed-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .post-card {
+            background: var(--card-bg, #ffffff);
+            border: 1px solid var(--border, #e1e8ed);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .post-author {
+            font-weight: bold;
+            color: var(--text-main, #14171a);
+        }
+        .post-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted, #657786);
+        }
+        .post-content {
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            color: var(--text-main, #14171a);
+        }
+        .post-media {
+            margin-top: 0.75rem;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border, #e1e8ed);
+        }
+        .post-actions {
+            display: flex;
+            gap: 1.5rem;
+            border-top: 1px solid var(--border, #e1e8ed);
+            padding-top: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text-muted, #657786);
+        }
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .action-item:hover {
+            color: var(--accent, #1da1f2);
+        }
+    </style>
 </head>
 <body>
     <div class="theme-switch-wrapper">
@@ -38,18 +98,17 @@
                 <h2>Curriculum Vitae & Research</h2>
                 <div class="project-grid">
                     <!-- CV Upload Card -->
-                    <article class="project-card" style="border: 2px solid var(--accent, #0076ff);">
+                    <article class="project-card-main" style="border: 2px solid var(--accent, #0076ff); padding: 1.25rem; border-radius: 12px; background: var(--card-bg, #fff);">
                         <h3>Curriculum Vitae</h3>
                         <p>View or download my full academic and professional CV outlining my qualifications, research background, and technical expertise.</p>
-                        <!-- PDF Download Action Button -->
-                        <a href="ramchandarnaik_cv.pdf" class="media-btn" target="_blank" style="display: inline-block; font-weight: bold;">📄 View My CV (PDF)</a>
+                        <a href="ramchandarnaik_cv.pdf" class="media-btn" target="_blank" style="display: inline-block; font-weight: bold; margin-top: 0.5rem;">📄 View My CV (PDF)</a>
                     </article>
 
                     <!-- Scientific Programming Card -->
-                    <article class="project-card">
+                    <article class="project-card-main" style="padding: 1.25rem; border-radius: 12px; background: var(--card-bg, #fff); border: 1px solid var(--border, #e1e8ed);">
                         <h3>Scientific Programming</h3>
                         <p>Developing automated architectures and script configurations using custom deep learning structures.</p>
-                        <div class="tag-container">
+                        <div class="tag-container" style="margin-top: 0.5rem;">
                             <span class="tag">Python</span>
                             <span class="tag">Bash</span>
                         </div>
@@ -57,23 +116,90 @@
                 </div>
             </section>
 
-            <!-- SECTION 3: MEDIA RESOURCE CENTER -->
-            <section class="card" id="gallery">
-                <h2>Media & Resources</h2>
-                <p>Explore streaming video discussions, recorded sessions, and audio presentations below.</p>
+            <!-- SECTION 3: RECENT UPDATES & FEED (Status/Tweet style) -->
+            <section class="card" id="feed">
+                <h2>Recent Updates</h2>
+                <p>Latest thoughts, milestones, and media snippets.</p>
                 
-                <div class="media-block">
-                    <h3>📢 Audio Discussion</h3>
-                    <audio controls style="width: 100%;">
-                        <source src="assets/presentation-audio.mp3" type="audio/mpeg">
-                    </audio>
-                </div>
+                <div class="feed-container">
+                    
+                    <!-- POST 1: TEXT ONLY -->
+                    <div class="post-card">
+                        <div class="post-header">
+                            <span class="post-author">@ramchandar_naik</span>
+                            <span class="post-meta">May 24, 2026 • 09:15 AM</span>
+                        </div>
+                        <div class="post-content">
+                            Spent the morning restructuring my portfolio layout and organizing my physics research artifacts. Clean code, clear mind! 💻✨
+                        </div>
+                        <div class="post-actions">
+                            <div class="action-item">❤️ <span>24 Likes</span></div>
+                            <div class="action-item">💬 <span>5 Comments</span></div>
+                            <div class="action-item">🔁 <span>Share</span></div>
+                        </div>
+                    </div>
 
-                <div class="media-block" style="margin-top: 1.5rem;">
-                    <h3>🎥 Presentation Recording</h3>
-                    <video controls width="100%" style="border-radius: 6px; border: 1px solid var(--border);">
-                        <source src="assets/trajectory-render.mp4" type="video/mp4">
-                    </video>
+                    <!-- POST 2: VIDEO POST -->
+                    <div class="post-card">
+                        <div class="post-header">
+                            <span class="post-author">@ramchandar_naik</span>
+                            <span class="post-meta">May 22, 2026 • 04:30 PM</span>
+                        </div>
+                        <div class="post-content">
+                            Just finished rendering the presentation recording for my latest simulation pipeline run. Performance optimizations are looking incredible. Check it out!
+                            <div class="post-media">
+                                <video controls width="100%" style="display: block;">
+                                    <source src="assets/trajectory-render.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                        </div>
+                        <div class="post-actions">
+                            <div class="action-item">❤️ <span>42 Likes</span></div>
+                            <div class="action-item">💬 <span>12 Comments</span></div>
+                            <div class="action-item">🔁 <span>Share</span></div>
+                        </div>
+                    </div>
+
+                    <!-- POST 3: AUDIO POST -->
+                    <div class="post-card">
+                        <div class="post-header">
+                            <span class="post-author">@ramchandar_naik</span>
+                            <span class="post-meta">May 18, 2026 • 11:05 AM</span>
+                        </div>
+                        <div class="post-content">
+                            🎙️ Short audio breakdown discussing the framework optimizations for scientific computing data architectures. 
+                            <div class="post-media" style="padding: 0.5rem; background: var(--bg, #f5f8fa);">
+                                <audio controls style="width: 100%; display: block;">
+                                    <source src="assets/presentation-audio.mp3" type="audio/mpeg">
+                                </audio>
+                            </div>
+                        </div>
+                        <div class="post-actions">
+                            <div class="action-item">❤️ <span>18 Likes</span></div>
+                            <div class="action-item">💬 <span>3 Comments</span></div>
+                            <div class="action-item">🔁 <span>Share</span></div>
+                        </div>
+                    </div>
+
+                    <!-- POST 4: IMAGE POST -->
+                    <div class="post-card">
+                        <div class="post-header">
+                            <span class="post-author">@ramchandar_naik</span>
+                            <span class="post-meta">May 12, 2026 • 02:15 PM</span>
+                        </div>
+                        <div class="post-content">
+                            A quick snapshot of my setup while testing out high-fidelity broadcasting and streaming parameters. Getting everything fine-tuned. 📸
+                            <div class="post-media">
+                                <img src="assets/setup-snapshot.jpg" alt="Setup Snapshot" style="width: 100%; height: auto; display: block;">
+                            </div>
+                        </div>
+                        <div class="post-actions">
+                            <div class="action-item">❤️ <span>56 Likes</span></div>
+                            <div class="action-item">💬 <span>9 Comments</span></div>
+                            <div class="action-item">🔁 <span>Share</span></div>
+                        </div>
+                    </div>
+
                 </div>
             </section>
         </main>
