@@ -1,3 +1,21 @@
+You hit on two very common roadblocks when dealing with client-side applications and Google APIs. Here is exactly why both of those issues are happening and how we fix them.
+
+### 1. Why Authentication "Isn't Found" or Fails
+
+Google's Identity Services (the popup that lets you log in) **strictly blocks** files opened directly from your computer (when the URL bar starts with `file:///C:/...`). It requires the site to be hosted on a real server or a local development server (like `http://localhost` or `http://127.0.0.1`).
+
+* **The Fix:** You need to serve the file using a local web server. If you are using VS Code, install the **Live Server** extension, right-click the HTML file, and select "Open with Live Server".
+* *Note: I also added an alert in the code below that will warn you if you forget to swap out the `YOUR_CLIENT_ID_HERE` placeholder.*
+
+### 2. Why Images Aren't Rendering on Reload
+
+In the previous version, the code only saved the *name* of the image to your Google Drive JSON file, not the actual image file itself. When you refreshed, the browser knew there was supposed to be an image named "graph.png", but it had no image data to display.
+
+* **The Fix:** We need to convert your uploaded images into **Base64 strings** (which turns an image into a long string of text). We can then save that text directly inside your `ram-portfolio-posts.json` file on Google Drive. When the page reloads, the browser reads the text string and draws the image instantly.
+
+Here is the fully updated code. Copy and paste this, making sure to swap your keys back in.
+
+```html
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -209,8 +227,9 @@
     .post-time{color:var(--muted);font-size:.7rem;margin-top:2px}
     .post-content{color:var(--text);line-height:1.8;font-size:.83rem;white-space:pre-wrap;word-break:break-word}
     .post-media{margin-top:1.25rem}
-    .post-media img{width:100%;border-radius:10px;border:1px solid var(--border);display:block}
-    .post-media video{width:100%;border-radius:10px;border:1px solid var(--border);display:block}
+    /* Constrain media sizes so base64 strings don't blow up layout */
+    .post-media img{width:100%; max-height: 500px; object-fit: cover; border-radius:10px;border:1px solid var(--border);display:block}
+    .post-media video{width:100%; max-height: 500px; border-radius:10px;border:1px solid var(--border);display:block}
     .post-media audio{width:100%;margin-top:.5rem}
     .post-media iframe{width:100%;height:480px;border-radius:10px;border:1px solid var(--border);display:block}
     .post-footer{display:flex;justify-content:space-between;align-items:center;
@@ -466,7 +485,6 @@ let gapiInited = false;
 let gisInited = false;
 let driveFileId = null;
 let _posts = [];
-const blobCache = {}; // For local media preview
 
 /* ═══════════════════════════════════════════════════════════════
    GOOGLE API INITIALIZATION
@@ -496,6 +514,17 @@ function checkReady() {
    AUTHENTICATION & SYNCING LOGIC
 ═══════════════════════════════════════════════════════════════ */
 function handleAuthClick() {
+  // Protocol Catch for local files
+  if (window.location.protocol === 'file:') {
+    alert("CRITICAL ERROR: Google Authentication blocks files opened via 'file:///'. You must serve this HTML file over a local server (e.g., using the 'Live Server' extension in VS Code) for the popup to work.");
+    return;
+  }
+  // Catch missing Client IDs
+  if (CLIENT_ID === 'YOUR_CLIENT_ID_HERE') {
+    alert("CRITICAL ERROR: You have not entered your Google Client ID into the Javascript code. The popup will fail.");
+    return;
+  }
+
   tokenClient.callback = async (resp) => {
     if (resp.error) { toast("Authentication failed.", true); return; }
     document.getElementById('authBtn').style.display = 'none';
@@ -630,17 +659,40 @@ function setDriveStatus(state,msg){
   txt.textContent=msg;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   FILE HANDLING & BASE 64 ENCODING (THE FIX FOR IMAGES)
+═══════════════════════════════════════════════════════════════ */
 let uploadedFile=null;
 const fileInput=document.getElementById("fileInput");
 const filePreview=document.getElementById("filePreview");
 
+// Helper function to convert a file to a Base64 string so it can be saved in JSON
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
+
 fileInput.addEventListener("change",e=>{
   uploadedFile=e.target.files[0];
+  
+  // File size safeguard (Optional, but good since JSON gets big with base64)
+  if(uploadedFile && uploadedFile.size > 2.5 * 1024 * 1024) {
+      toast("File is too large! Please keep attachments under 2.5MB.", true);
+      uploadedFile = null;
+      fileInput.value = "";
+      return;
+  }
+
   if(uploadedFile){
     document.getElementById("fileName").textContent=uploadedFile.name;
     filePreview.classList.add("show");
   }
 });
+
 document.getElementById("removeFile").addEventListener("click",()=>{
   uploadedFile=null;fileInput.value="";filePreview.classList.remove("show");
 });
@@ -683,15 +735,13 @@ function buildPost(p,idx){
   const div=document.createElement("div");
   div.className="post";
 
-  let mediaURL=blobCache[p.id]||null;
+  // Use the saved Base64 string directly from the Google Drive JSON
   let mediaHTML="";
-  if(mediaURL&&p.mediaType){
-    if(p.mediaType.startsWith("image")) mediaHTML=`<div class="post-media"><img src="${mediaURL}" loading="lazy" alt="attachment"></div>`;
-    else if(p.mediaType.startsWith("video")) mediaHTML=`<div class="post-media"><video controls><source src="${mediaURL}"></video></div>`;
-    else if(p.mediaType.startsWith("audio")) mediaHTML=`<div class="post-media"><audio controls><source src="${mediaURL}"></audio></div>`;
-    else if(p.mediaType==="application/pdf") mediaHTML=`<div class="post-media"><iframe src="${mediaURL}" title="PDF"></iframe></div>`;
-  } else if(p.mediaName&&!mediaURL){
-    mediaHTML=`<div style="margin-top:.75rem;font-size:.72rem;color:var(--muted)">📎 ${esc(p.mediaName)} <em>(session ended — re-attach to view)</em></div>`;
+  if(p.mediaData && p.mediaType){
+    if(p.mediaType.startsWith("image")) mediaHTML=`<div class="post-media"><img src="${p.mediaData}" loading="lazy" alt="attachment"></div>`;
+    else if(p.mediaType.startsWith("video")) mediaHTML=`<div class="post-media"><video controls><source src="${p.mediaData}"></video></div>`;
+    else if(p.mediaType.startsWith("audio")) mediaHTML=`<div class="post-media"><audio controls><source src="${p.mediaData}"></audio></div>`;
+    else if(p.mediaType==="application/pdf") mediaHTML=`<div class="post-media"><iframe src="${p.mediaData}" title="PDF"></iframe></div>`;
   }
 
   div.innerHTML=`
@@ -726,14 +776,27 @@ async function createPost(){
 
   const now=new Date();
   const id="post_"+Date.now();
+  
+  // Convert image to Base64 string before creating the post object
+  let base64Data = null;
+  if(uploadedFile) {
+      try {
+          base64Data = await toBase64(uploadedFile);
+      } catch (err) {
+          toast("Failed to process the attachment.", true);
+          btn.disabled = false;
+          btn.textContent = "▶ Publish to Drive";
+          return;
+      }
+  }
+
   const post={
     id,text:text||"",
     date:now.toLocaleDateString(),time:now.toLocaleTimeString(),
     mediaName:uploadedFile?uploadedFile.name:null,
-    mediaType:uploadedFile?uploadedFile.type:null
+    mediaType:uploadedFile?uploadedFile.type:null,
+    mediaData:base64Data // This saves the actual image code to Drive
   };
-
-  if(uploadedFile) blobCache[id]=URL.createObjectURL(uploadedFile);
 
   const updated=[..._posts,post];
   renderAll(updated);
@@ -761,3 +824,5 @@ async function clearAllPosts(){
 </script>
 </body>
 </html>
+
+```
