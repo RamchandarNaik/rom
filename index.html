@@ -7,10 +7,19 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Theme Toggle Wrapper -->
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" />
+            <div class="slider round"></div>
+        </label>
+        <span class="toggle-text">Toggle Theme</span>
+    </div>
+
     <div class="container">
         <header>
             <h1>M Ramchandar Naik</h1>
-            <p class="subtitle">Particle Physics Researcher</p>
+            <p class="subtitle">Particle Physics Student</p>
         </header>
 
         <main>
@@ -23,19 +32,58 @@
                 </p>
             </section>
 
-            <section class="card">
-                <h2>Core Interests</h2>
-                <ul class="interests-list">
-                    <li>Molecular Dynamics & Phase Behavior</li>
-                    <li>Scientific Programming & Automation</li>
-                    <li>Open Source & Educational Broadcasting</li>
-                </ul>
-            </section>
+            <!-- Upgraded Dynamic Project Grid -->
+            <h2>Featured Projects</h2>
+            <div class="project-grid">
+                <article class="project-card">
+                    <h3>Molecular Dynamics Simulations</h3>
+                    <p>Optimizing parameter scripts and investigating thermodynamic pathways of molecular structures.</p>
+                    <div class="tag-container">
+                        <span class="tag">C++</span>
+                        <span class="tag">Bash</span>
+                    </div>
+                </article>
+
+                <article class="project-card">
+                    <h3>Scientific Neural Networks</h3>
+                    <p>Developing 3D solver configurations applying deep learning models directly to partial differential equations.</p>
+                    <div class="tag-container">
+                        <span class="tag">Python</span>
+                        <span class="tag">PyTorch</span>
+                    </div>
+                </article>
+            </div>
         </main>
 
         <footer>
             <p>Connect with me on <a href="https://github.com">GitHub</a></p>
         </footer>
     </div>
+
+    <!-- Theme Control Logic -->
+    <script>
+        const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme) {
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            if (currentTheme === 'light') {
+                toggleSwitch.checked = true;
+            }
+        }
+
+        function switchTheme(e) {
+            if (e.target.checked) {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }    
+        }
+
+        toggleSwitch.addEventListener('change', switchTheme, false);
+    </script>
 </body>
 </html>
+
