@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ramchandar Naik | Portfolio</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Inline styles added specifically for the social feed to look like modern status/tweet cards -->
+    <!-- Enhanced inline styles for interactive comments and dynamic likes -->
     <style>
         .feed-container {
             display: flex;
@@ -51,7 +51,8 @@
             display: flex;
             gap: 1.5rem;
             border-top: 1px solid var(--border, #e1e8ed);
-            padding-top: 0.75rem;
+            border-bottom: 1px solid var(--border, #e1e8ed);
+            padding: 0.75rem 0;
             font-size: 0.9rem;
             color: var(--text-muted, #657786);
         }
@@ -60,10 +61,74 @@
             align-items: center;
             gap: 0.35rem;
             cursor: pointer;
-            transition: color 0.2s;
+            user-select: none;
+            transition: transform 0.1s ease, color 0.2s;
         }
         .action-item:hover {
-            color: var(--accent, #1da1f2);
+            color: #e0245e;
+        }
+        .action-item:active {
+            transform: scale(1.15);
+        }
+        .action-item.liked {
+            color: #e0245e;
+            font-weight: bold;
+        }
+        
+        /* Interactive Comment Section Layout */
+        .comments-section {
+            margin-top: 0.75rem;
+            padding-top: 0.5rem;
+        }
+        .comments-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 0.75rem 0;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+        .comment-item {
+            padding: 0.4rem 0.5rem;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.02);
+            margin-bottom: 0.35rem;
+            line-height: 1.4;
+        }
+        .comment-user {
+            font-weight: bold;
+            margin-right: 0.35rem;
+            color: var(--text-main, #14171a);
+        }
+        .comment-input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .comment-input {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border-radius: 20px;
+            border: 1px solid var(--border, #e1e8ed);
+            background: var(--bg, #f5f8fa);
+            color: var(--text-main, #14171a);
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .comment-input:focus {
+            border-color: var(--accent, #0076ff);
+        }
+        .comment-submit-btn {
+            background: var(--accent, #0076ff);
+            color: white;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .comment-submit-btn:hover {
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -116,7 +181,7 @@
                 </div>
             </section>
 
-            <!-- SECTION 3: RECENT UPDATES & FEED (Status/Tweet style) -->
+            <!-- SECTION 3: RECENT UPDATES & FEED -->
             <section class="card" id="feed">
                 <h2>Recent Updates</h2>
                 <p>Latest thoughts, milestones, and media snippets.</p>
@@ -124,7 +189,7 @@
                 <div class="feed-container">
                     
                     <!-- POST 1: TEXT ONLY -->
-                    <div class="post-card">
+                    <div class="post-card" data-post-id="1">
                         <div class="post-header">
                             <span class="post-author">@ramchandar_naik</span>
                             <span class="post-meta">May 24, 2026 • 09:15 AM</span>
@@ -133,14 +198,22 @@
                             Spent the morning restructuring my portfolio layout and organizing my physics research artifacts. Clean code, clear mind! 💻✨
                         </div>
                         <div class="post-actions">
-                            <div class="action-item">❤️ <span>24 Likes</span></div>
-                            <div class="action-item">💬 <span>5 Comments</span></div>
-                            <div class="action-item">🔁 <span>Share</span></div>
+                            <div class="action-item like-btn">❤️ <span class="like-count">24</span> Likes</div>
+                            <div class="action-item toggle-comments-btn">💬 <span class="comment-count">1</span> Comments</div>
+                        </div>
+                        <div class="comments-section">
+                            <div class="comments-list">
+                                <div class="comment-item"><span class="comment-user">@visitor_1:</span>Looks very clean and organized!</div>
+                            </div>
+                            <div class="comment-input-wrapper">
+                                <input type="text" class="comment-input" placeholder="Write a comment...">
+                                <button class="comment-submit-btn">Post</button>
+                            </div>
                         </div>
                     </div>
 
                     <!-- POST 2: VIDEO POST -->
-                    <div class="post-card">
+                    <div class="post-card" data-post-id="2">
                         <div class="post-header">
                             <span class="post-author">@ramchandar_naik</span>
                             <span class="post-meta">May 22, 2026 • 04:30 PM</span>
@@ -154,14 +227,23 @@
                             </div>
                         </div>
                         <div class="post-actions">
-                            <div class="action-item">❤️ <span>42 Likes</span></div>
-                            <div class="action-item">💬 <span>12 Comments</span></div>
-                            <div class="action-item">🔁 <span>Share</span></div>
+                            <div class="action-item like-btn">❤️ <span class="like-count">42</span> Likes</div>
+                            <div class="action-item toggle-comments-btn">💬 <span class="comment-count">2</span> Comments</div>
+                        </div>
+                        <div class="comments-section">
+                            <div class="comments-list">
+                                <div class="comment-item"><span class="comment-user">@peer_reviewer:</span>What framework did you compile this tracking loop with?</div>
+                                <div class="comment-item"><span class="comment-user">@ayan_das:</span>Awesome speedup metrics man!</div>
+                            </div>
+                            <div class="comment-input-wrapper">
+                                <input type="text" class="comment-input" placeholder="Write a comment...">
+                                <button class="comment-submit-btn">Post</button>
+                            </div>
                         </div>
                     </div>
 
                     <!-- POST 3: AUDIO POST -->
-                    <div class="post-card">
+                    <div class="post-card" data-post-id="3">
                         <div class="post-header">
                             <span class="post-author">@ramchandar_naik</span>
                             <span class="post-meta">May 18, 2026 • 11:05 AM</span>
@@ -175,28 +257,15 @@
                             </div>
                         </div>
                         <div class="post-actions">
-                            <div class="action-item">❤️ <span>18 Likes</span></div>
-                            <div class="action-item">💬 <span>3 Comments</span></div>
-                            <div class="action-item">🔁 <span>Share</span></div>
+                            <div class="action-item like-btn">❤️ <span class="like-count">18</span> Likes</div>
+                            <div class="action-item toggle-comments-btn">💬 <span class="comment-count">0</span> Comments</div>
                         </div>
-                    </div>
-
-                    <!-- POST 4: IMAGE POST -->
-                    <div class="post-card">
-                        <div class="post-header">
-                            <span class="post-author">@ramchandar_naik</span>
-                            <span class="post-meta">May 12, 2026 • 02:15 PM</span>
-                        </div>
-                        <div class="post-content">
-                            A quick snapshot of my setup while testing out high-fidelity broadcasting and streaming parameters. Getting everything fine-tuned. 📸
-                            <div class="post-media">
-                                <img src="assets/setup-snapshot.jpg" alt="Setup Snapshot" style="width: 100%; height: auto; display: block;">
+                        <div class="comments-section">
+                            <div class="comments-list"></div>
+                            <div class="comment-input-wrapper">
+                                <input type="text" class="comment-input" placeholder="Write a comment...">
+                                <button class="comment-submit-btn">Post</button>
                             </div>
-                        </div>
-                        <div class="post-actions">
-                            <div class="action-item">❤️ <span>56 Likes</span></div>
-                            <div class="action-item">💬 <span>9 Comments</span></div>
-                            <div class="action-item">🔁 <span>Share</span></div>
                         </div>
                     </div>
 
@@ -227,6 +296,70 @@
             }    
         }
         toggleSwitch.addEventListener('change', switchTheme, false);
+    </script>
+
+    <!-- Social Engine Interaction Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Like Handler Setup
+            document.querySelectorAll('.like-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const countEl = btn.querySelector('.like-count');
+                    let currentLikes = parseInt(countEl.textContent, 10);
+                    
+                    if (btn.classList.contains('liked')) {
+                        btn.classList.remove('liked');
+                        countEl.textContent = currentLikes - 1;
+                    } else {
+                        btn.classList.add('liked');
+                        countEl.textContent = currentLikes + 1;
+                    }
+                });
+            });
+
+            // Comment Posting Setup Function
+            const addComment = (cardEl) => {
+                const inputEl = cardEl.querySelector('.comment-input');
+                const text = inputEl.value.trim();
+                if (!text) return;
+
+                const listEl = cardEl.querySelector('.comments-list');
+                const countEl = cardEl.querySelector('.comment-count');
+
+                // Build new comment node
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'comment-item';
+                commentDiv.innerHTML = `<span class="comment-user">@you:</span>${escapeHTML(text)}`;
+                
+                listEl.appendChild(commentDiv);
+                
+                // Update total comments indicator metric
+                let currentComments = parseInt(countEl.textContent, 10);
+                countEl.textContent = currentComments + 1;
+
+                // Reset field and scroll to tracking bottom
+                inputEl.value = '';
+                listEl.scrollTop = listEl.scrollHeight;
+            };
+
+            // Hook Event Listeners for Comments
+            document.querySelectorAll('.post-card').forEach(card => {
+                const submitBtn = card.querySelector('.comment-submit-btn');
+                const inputField = card.querySelector('.comment-input');
+
+                submitBtn.addEventListener('click', () => addComment(card));
+                inputField.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') addComment(card);
+                });
+            });
+
+            // Helper to clean output text entries
+            function escapeHTML(str) {
+                return str.replace(/[&<>'"]/g, 
+                    tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+                );
+            }
+        });
     </script>
 </body>
 </html>
