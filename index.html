@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Personal Profile</title>
+    <title>Ramchandar Naik | Portfolio</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Theme Toggle Wrapper -->
     <div class="theme-switch-wrapper">
         <label class="theme-switch" for="checkbox">
             <input type="checkbox" id="checkbox" />
@@ -17,42 +16,63 @@
     </div>
 
     <div class="container">
+        <!-- HEADER SECTION -->
         <header>
-            <h1>M Ramchandar Naik</h1>
-            <p class="subtitle">Particle Physics Student</p>
+            <h1>Ramchandar Naik</h1>
+            <p class="subtitle">Computational Physics Researcher & Developer</p>
         </header>
 
         <main>
-            <section class="card">
+            <!-- SECTION 1: BIOGRAPHY -->
+            <section class="card" id="about">
                 <h2>About Me</h2>
                 <p>
                     Passionate about solving complex physical problems through scientific computing, 
-                    high-performance molecular dynamics simulations, and data analysis. 
-                    Exploring the intersections of theoretical frameworks and elegant engineering solutions.
+                    high-performance molecular dynamics simulations, and data analysis.
                 </p>
             </section>
 
-            <!-- Upgraded Dynamic Project Grid -->
-            <h2>Featured Projects</h2>
-            <div class="project-grid">
-                <article class="project-card">
-                    <h3>Molecular Dynamics Simulations</h3>
-                    <p>Optimizing parameter scripts and investigating thermodynamic pathways of molecular structures.</p>
-                    <div class="tag-container">
-                        <span class="tag">C++</span>
-                        <span class="tag">Bash</span>
-                    </div>
-                </article>
+            <!-- SECTION 2: PROJECT CARDS & DOCUMENTS -->
+            <section id="projects">
+                <h2>Featured Research</h2>
+                <div class="project-grid">
+                    <article class="project-card">
+                        <h3>Molecular Dynamics Analysis</h3>
+                        <p>Investigating thermodynamic pathways and phase behavior of fluid configurations.</p>
+                        <!-- PDF Download Action Button -->
+                        <a href="assets/phase-analysis.pdf" class="media-btn" target="_blank">📋 Read Report (PDF)</a>
+                    </article>
 
-                <article class="project-card">
-                    <h3>Scientific Neural Networks</h3>
-                    <p>Developing 3D solver configurations applying deep learning models directly to partial differential equations.</p>
-                    <div class="tag-container">
-                        <span class="tag">Python</span>
-                        <span class="tag">PyTorch</span>
-                    </div>
-                </article>
-            </div>
+                    <article class="project-card">
+                        <h3>Scientific Programming</h3>
+                        <p>Developing automated architectures and script configurations using custom deep learning structures.</p>
+                        <div class="tag-container">
+                            <span class="tag">Python</span>
+                            <span class="tag">Bash</span>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- SECTION 3: MEDIA RESOURCE CENTER -->
+            <section class="card" id="gallery">
+                <h2>Media & Resources</h2>
+                <p>Explore streaming video discussions, recorded sessions, and audio presentations below.</p>
+                
+                <div class="media-block">
+                    <h3>📢 Audio Discussion</h3>
+                    <audio controls style="width: 100%;">
+                        <source src="assets/presentation-audio.mp3" type="audio/mpeg">
+                    </audio>
+                </div>
+
+                <div class="media-block" style="margin-top: 1.5rem;">
+                    <h3>🎥 Simulation Recording</h3>
+                    <video controls width="100%" style="border-radius: 6px; border: 1px solid var(--border);">
+                        <source src="assets/trajectory-render.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </section>
         </main>
 
         <footer>
@@ -60,18 +80,14 @@
         </footer>
     </div>
 
-    <!-- Theme Control Logic -->
+    <!-- Theme Controller Script -->
     <script>
         const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
         const currentTheme = localStorage.getItem('theme');
-
         if (currentTheme) {
             document.documentElement.setAttribute('data-theme', currentTheme);
-            if (currentTheme === 'light') {
-                toggleSwitch.checked = true;
-            }
+            if (currentTheme === 'light') toggleSwitch.checked = true;
         }
-
         function switchTheme(e) {
             if (e.target.checked) {
                 document.documentElement.setAttribute('data-theme', 'light');
@@ -81,7 +97,6 @@
                 localStorage.setItem('theme', 'dark');
             }    
         }
-
         toggleSwitch.addEventListener('change', switchTheme, false);
     </script>
 </body>
