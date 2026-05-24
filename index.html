@@ -56,7 +56,7 @@
       transition:transform .3s var(--ease),background .3s var(--ease);
     }
     .logo{font-family:var(--font-h);font-size:2.4rem;font-weight:800;
-          color:var(--accent);letter-spacing:4px;margin-bottom:.2rem;position:relative}
+         color:var(--accent);letter-spacing:4px;margin-bottom:.2rem;position:relative}
     .logo::after{content:'';display:block;height:2px;width:100%;
       background:linear-gradient(90deg,var(--accent),transparent);margin-top:4px}
     .logo-sub{font-size:.62rem;color:var(--muted);letter-spacing:2px;
@@ -96,6 +96,8 @@
     .drive-status.syncing .drive-dot{background:var(--yellow);animation:pulse .8s infinite alternate}
     .drive-status.error   .drive-dot{background:var(--red)}
     @keyframes pulse{from{opacity:.4}to{opacity:1}}
+
+    .auth-btn { width: 100%; margin-top: 1rem; padding: 0.6rem; text-align: center; justify-content: center;}
 
     /* ── MAIN ─────────────────────────────────────────────────── */
     .main{margin-left:var(--sw);width:calc(100% - var(--sw));padding:3rem 2.5rem}
@@ -221,7 +223,6 @@
     @keyframes heartPop{0%{transform:scale(1)}50%{transform:scale(1.5)}100%{transform:scale(1)}}
     .post-idx{font-size:.62rem;color:var(--border)}
 
-    /* Drive badge on post */
     .drive-badge{display:inline-flex;align-items:center;gap:.3rem;
       font-size:.62rem;color:var(--green);opacity:.7;margin-top:.4rem}
 
@@ -283,6 +284,9 @@
       .main{margin-left:0;width:100%;padding:1.5rem 1rem;padding-top:4rem}
     }
   </style>
+
+  <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+  <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </head>
 <body>
 
@@ -291,7 +295,6 @@
 
 <div class="layout">
 
-  <!-- ═══ SIDEBAR ════════════════════════════════════════════ -->
   <aside class="sidebar" id="sidebar">
     <div>
       <div class="logo">RAM</div>
@@ -300,23 +303,25 @@
 
     <nav id="nav">
       <a href="#about"    class="active"><span class="nav-icon">◈</span>About</a>
-      <a href="#research"             ><span class="nav-icon">⬡</span>Research</a>
-      <a href="#projects"             ><span class="nav-icon">⬢</span>Projects</a>
-      <a href="#skills"               ><span class="nav-icon">◉</span>Skills</a>
-      <a href="#posts"                >
+      <a href="#research"               ><span class="nav-icon">⬡</span>Research</a>
+      <a href="#projects"               ><span class="nav-icon">⬢</span>Projects</a>
+      <a href="#skills"                 ><span class="nav-icon">◉</span>Skills</a>
+      <a href="#posts"                  >
         <span class="nav-icon">◎</span>Posts
         <span class="post-count-badge" id="postBadge">0</span>
       </a>
-      <a href="#contact"              ><span class="nav-icon">◌</span>Contact</a>
+      <a href="#contact"                ><span class="nav-icon">◌</span>Contact</a>
     </nav>
 
     <div class="sidebar-footer">
-      <!-- Drive Status -->
-      <div class="drive-status" id="driveStatus">
+      <div class="drive-status error" id="driveStatus">
         <div class="drive-dot"></div>
-        <span id="driveStatusText">Connecting Drive…</span>
+        <span id="driveStatusText">Drive Disconnected</span>
       </div>
-      <!-- Theme -->
+      
+      <button id="authBtn" class="btn btn-primary auth-btn" onclick="handleAuthClick()">Connect Google Drive</button>
+      <button id="signoutBtn" class="btn btn-ghost auth-btn" style="display: none;" onclick="handleSignoutClick()">Disconnect Drive</button>
+
       <div class="theme-row">
         <span class="theme-label">Theme</span>
         <label class="theme-switch">
@@ -327,11 +332,9 @@
     </div>
   </aside>
 
-  <!-- ═══ MAIN ════════════════════════════════════════════════ -->
   <main class="main">
     <div class="container">
 
-      <!-- HERO -->
       <header id="about">
         <div class="hero-tag">MSc · IIT Bombay</div>
         <h1>M Ramchandar<br>Naik</h1>
@@ -352,7 +355,6 @@
         </div>
       </header>
 
-      <!-- RESEARCH -->
       <section id="research">
         <h2>Research</h2>
         <div class="card">
@@ -366,7 +368,6 @@
         </div>
       </section>
 
-      <!-- PROJECTS -->
       <section id="projects">
         <h2>Projects</h2>
         <div class="card">
@@ -389,7 +390,6 @@
         </div>
       </section>
 
-      <!-- SKILLS -->
       <section id="skills">
         <h2>Skills</h2>
         <div class="skills-grid">
@@ -404,11 +404,9 @@
         </div>
       </section>
 
-      <!-- POSTS -->
       <section id="posts">
         <h2>Research Posts</h2>
 
-        <!-- FORM -->
         <div class="post-form">
           <div class="form-top">
             <div class="avatar">RAM</div>
@@ -426,16 +424,13 @@
           </div>
         </div>
 
-        <!-- FEED CONTROLS -->
         <div class="feed-header">
-          <span class="feed-meta" id="feedMeta">Loading from Google Drive…</span>
+          <span class="feed-meta" id="feedMeta">Please connect Google Drive to load posts.</span>
           <button class="clear-btn" id="clearBtn" style="display:none" onclick="clearAllPosts()">Clear all</button>
         </div>
 
-        <!-- FEED -->
         <div class="feed" id="feed">
-          <!-- skeleton while loading -->
-          <div class="skeleton" id="loadingSkeleton">
+          <div class="skeleton" id="loadingSkeleton" style="display: none;">
             <div class="skel-line short"></div>
             <div class="skel-line"></div>
             <div class="skel-line"></div>
@@ -443,7 +438,6 @@
         </div>
       </section>
 
-      <!-- CONTACT -->
       <section id="contact">
         <h2>Contact</h2>
         <div class="contact-grid">
@@ -459,7 +453,153 @@
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   THEME
+   GOOGLE DRIVE CONFIGURATION (Must fill these out!)
+═══════════════════════════════════════════════════════════════ */
+const CLIENT_ID = 'YOUR_CLIENT_ID_HERE'; // e.g. 123456-abc.apps.googleusercontent.com
+const API_KEY = 'YOUR_API_KEY_HERE'; // e.g. AIzaSyB-1234567890abcdef
+const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
+const SCOPES = 'https://www.googleapis.com/auth/drive.file'; // Creates and manages files created by this app
+const FILE_NAME = 'ram-portfolio-posts.json';
+
+let tokenClient;
+let gapiInited = false;
+let gisInited = false;
+let driveFileId = null;
+let _posts = [];
+const blobCache = {}; // For local media preview
+
+/* ═══════════════════════════════════════════════════════════════
+   GOOGLE API INITIALIZATION
+═══════════════════════════════════════════════════════════════ */
+function gapiLoaded() { gapi.load('client', intializeGapiClient); }
+async function intializeGapiClient() {
+  await gapi.client.init({ apiKey: API_KEY, discoveryDocs: [DISCOVERY_DOC] });
+  gapiInited = true;
+  checkReady();
+}
+function gisLoaded() {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: '', // defined later in handleAuthClick
+  });
+  gisInited = true;
+  checkReady();
+}
+function checkReady() {
+  if (gapiInited && gisInited) {
+    document.getElementById("driveStatusText").textContent = "Drive Ready. Please Connect.";
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AUTHENTICATION & SYNCING LOGIC
+═══════════════════════════════════════════════════════════════ */
+function handleAuthClick() {
+  tokenClient.callback = async (resp) => {
+    if (resp.error) { toast("Authentication failed.", true); return; }
+    document.getElementById('authBtn').style.display = 'none';
+    document.getElementById('signoutBtn').style.display = 'flex';
+    setDriveStatus('synced', 'Drive Connected');
+    await fetchPostsFromDrive();
+  };
+  if (gapi.client.getToken() === null) {
+    tokenClient.requestAccessToken({prompt: 'consent'});
+  } else {
+    tokenClient.requestAccessToken({prompt: ''});
+  }
+}
+
+function handleSignoutClick() {
+  const token = gapi.client.getToken();
+  if (token) {
+    google.accounts.oauth2.revoke(token.access_token);
+    gapi.client.setToken('');
+    document.getElementById('authBtn').style.display = 'flex';
+    document.getElementById('signoutBtn').style.display = 'none';
+    setDriveStatus('error', 'Drive Disconnected');
+    renderAll([]); // Clear UI on signout
+    document.getElementById("feedMeta").textContent = "Please connect Google Drive to load posts.";
+  }
+}
+
+async function fetchPostsFromDrive() {
+  setDriveStatus('syncing', 'Syncing...');
+  document.getElementById("loadingSkeleton").style.display = "block";
+  document.getElementById("feed").querySelectorAll(".post, .empty-state").forEach(el => el.remove());
+
+  try {
+    // 1. Find if the file exists
+    const response = await gapi.client.drive.files.list({
+      q: `name='${FILE_NAME}' and trashed=false`,
+      spaces: 'drive',
+      fields: 'files(id, name)'
+    });
+    const files = response.result.files;
+
+    if (files && files.length > 0) {
+      driveFileId = files[0].id;
+      // 2. Get file content
+      const fileResponse = await gapi.client.drive.files.get({
+        fileId: driveFileId,
+        alt: 'media'
+      });
+      _posts = typeof fileResponse.result === 'string' ? JSON.parse(fileResponse.result) : fileResponse.result;
+    } else {
+      _posts = [];
+      driveFileId = null;
+    }
+    setDriveStatus('synced', 'Drive Connected ✓');
+    renderAll(_posts);
+  } catch (err) {
+    console.error(err);
+    toast("Error loading from Drive.", true);
+    setDriveStatus('error', 'Sync Failed');
+    document.getElementById("loadingSkeleton").style.display = "none";
+  }
+}
+
+async function saveToDrive(updatedPosts) {
+  setDriveStatus('syncing', 'Saving to Drive...');
+  const jsonContent = JSON.stringify(updatedPosts, null, 2);
+  const fileContent = new Blob([jsonContent], {type: 'application/json'});
+  
+  const token = gapi.client.getToken().access_token;
+  const metadata = { name: FILE_NAME, mimeType: 'application/json' };
+  
+  const form = new FormData();
+  form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+  form.append('file', fileContent);
+
+  try {
+    let url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+    let method = 'POST';
+
+    if (driveFileId) {
+      url = `https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`;
+      method = 'PATCH';
+    }
+
+    const res = await fetch(url, {
+      method: method,
+      headers: new Headers({ 'Authorization': 'Bearer ' + token }),
+      body: form
+    });
+    
+    const data = await res.json();
+    if(data.id) driveFileId = data.id; // Save ID if newly created
+    
+    setDriveStatus('synced', 'Drive Connected ✓');
+    toast("☁ Saved to Google Drive!");
+  } catch (err) {
+    console.error(err);
+    toast("Failed to save to Drive.", true);
+    setDriveStatus('error', 'Sync Failed');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THEME, UI, & EVENT LISTENERS
 ═══════════════════════════════════════════════════════════════ */
 const toggle=document.getElementById("theme-toggle");
 if(localStorage.getItem("ram-theme")==="light"){
@@ -471,38 +611,10 @@ toggle.addEventListener("change",()=>{
   localStorage.setItem("ram-theme",t);
 });
 
-/* ═══════════════════════════════════════════════════════════════
-   MOBILE SIDEBAR
-═══════════════════════════════════════════════════════════════ */
 const ham=document.getElementById("hamburger"),sb=document.getElementById("sidebar");
 ham.addEventListener("click",()=>sb.classList.toggle("open"));
 document.addEventListener("click",e=>{if(!sb.contains(e.target)&&e.target!==ham)sb.classList.remove("open");});
 
-/* ═══════════════════════════════════════════════════════════════
-   ACTIVE NAV (IntersectionObserver)
-═══════════════════════════════════════════════════════════════ */
-const sections=document.querySelectorAll("header[id],section[id]");
-const navLinks=document.querySelectorAll("nav a");
-new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      navLinks.forEach(a=>a.classList.remove("active"));
-      const a=document.querySelector(`nav a[href="#${e.target.id}"]`);
-      if(a)a.classList.add("active");
-    }
-  });
-},{threshold:.35}).observe||(()=>{})();
-sections.forEach(s=>new IntersectionObserver(entries=>{
-  if(entries[0].isIntersecting){
-    navLinks.forEach(a=>a.classList.remove("active"));
-    const a=document.querySelector(`nav a[href="#${s.id}"]`);
-    if(a)a.classList.add("active");
-  }
-},{threshold:.35}).observe(s));
-
-/* ═══════════════════════════════════════════════════════════════
-   TOAST
-═══════════════════════════════════════════════════════════════ */
 function toast(msg,isErr=false){
   const el=document.createElement("div");
   el.className="toast"+(isErr?" err":"");
@@ -511,9 +623,6 @@ function toast(msg,isErr=false){
   setTimeout(()=>{el.style.animation="toastOut .3s ease forwards";setTimeout(()=>el.remove(),300);},2400);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   DRIVE STATUS UI
-═══════════════════════════════════════════════════════════════ */
 function setDriveStatus(state,msg){
   const el=document.getElementById("driveStatus");
   const txt=document.getElementById("driveStatusText");
@@ -521,101 +630,6 @@ function setDriveStatus(state,msg){
   txt.textContent=msg;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   GOOGLE DRIVE MCP VIA ANTHROPIC API
-═══════════════════════════════════════════════════════════════ */
-const DRIVE_MCP={type:"url",url:"https://drivemcp.googleapis.com/mcp/v1",name:"gdrive"};
-const FILE_NAME="ram-portfolio-posts.json";
-const MODEL="claude-sonnet-4-20250514";
-
-// In-memory session cache for blob URLs (can't be JSON serialised)
-const blobCache={};
-
-async function callAPI(messages,sys){
-  const res=await fetch("https://api.anthropic.com/v1/messages",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      model:MODEL,
-      max_tokens:4096,
-      system:sys||"You manage files in Google Drive for the RAM Research Portfolio. Be concise and precise.",
-      messages,
-      mcp_servers:[DRIVE_MCP]
-    })
-  });
-  if(!res.ok){
-    const e=await res.json().catch(()=>({}));
-    throw new Error(e.error?.message||`API error ${res.status}`);
-  }
-  return res.json();
-}
-
-// Extract text blocks from API response
-function extractText(data){
-  return (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");
-}
-
-// Parse JSON safely out of a text response
-function safeParseJSON(raw){
-  const str=raw.trim().replace(/^```(?:json)?\n?/,"").replace(/\n?```$/,"").trim();
-  return JSON.parse(str);
-}
-
-/* ─── LOAD POSTS FROM DRIVE ─────────────────────────────────── */
-async function loadPostsFromDrive(){
-  setDriveStatus("syncing","Syncing with Drive…");
-  const data=await callAPI([{
-    role:"user",
-    content:`Search Google Drive for a file named exactly "${FILE_NAME}".
-If found, read its full content and return ONLY the raw JSON array inside it, no markdown, no explanation.
-If the file does not exist, return exactly: []`
-  }],
-  "You are a Google Drive file reader. Return ONLY raw JSON, nothing else. No markdown fences, no explanation.");
-
-  const raw=extractText(data);
-  try{
-    const parsed=safeParseJSON(raw);
-    if(!Array.isArray(parsed)) return [];
-    setDriveStatus("synced","Drive synced ✓");
-    return parsed;
-  }catch{
-    // If it returned [] literally
-    if(raw.includes("[]")) return [];
-    throw new Error("Could not parse posts from Drive.");
-  }
-}
-
-/* ─── SAVE POSTS TO DRIVE ───────────────────────────────────── */
-async function savePostsToDrive(posts){
-  // Strip blob URLs before saving (they're session-only)
-  const saveable=posts.map(p=>({...p,mediaURL:null,mediaSaved:false}));
-  const json=JSON.stringify(saveable,null,2);
-
-  setDriveStatus("syncing","Saving to Drive…");
-  await callAPI([{
-    role:"user",
-    content:`You need to save data to Google Drive.
-Search for a file named exactly "${FILE_NAME}".
-If the file EXISTS: update / overwrite its content with the JSON below.
-If it does NOT exist: create a new file named "${FILE_NAME}" with the JSON below.
-Here is the JSON content to save:
-${json}
-Confirm when done with a single word: SAVED`
-  }]);
-  setDriveStatus("synced","Drive synced ✓");
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   LOCAL CACHE (IndexedDB-free fallback — localStorage)
-   Used to render immediately while Drive loads / saves
-═══════════════════════════════════════════════════════════════ */
-const CACHE_KEY="ram-posts-cache";
-function cacheLoad(){try{return JSON.parse(localStorage.getItem(CACHE_KEY))||[];}catch{return[];}}
-function cacheSave(p){localStorage.setItem(CACHE_KEY,JSON.stringify(p));}
-
-/* ═══════════════════════════════════════════════════════════════
-   FILE ATTACHMENT
-═══════════════════════════════════════════════════════════════ */
 let uploadedFile=null;
 const fileInput=document.getElementById("fileInput");
 const filePreview=document.getElementById("filePreview");
@@ -637,26 +651,21 @@ function updateCharCount(){
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   RENDER
+   RENDERING & POST LOGIC
 ═══════════════════════════════════════════════════════════════ */
-let _posts=[];
-
 function renderAll(posts){
   _posts=[...posts];
   const n=_posts.length;
   document.getElementById("postBadge").textContent=n;
   document.getElementById("statPosts").textContent=n;
-  document.getElementById("feedMeta").textContent=
-    n===0?"No posts yet — be the first to publish!":
-    `${n} post${n>1?"s":""} · synced with Google Drive`;
+  document.getElementById("feedMeta").textContent= n===0?"No posts yet — be the first to publish!": `${n} post${n>1?"s":""} · synced with Google Drive`;
   document.getElementById("clearBtn").style.display=n>0?"inline":"none";
   document.getElementById("loadingSkeleton").style.display="none";
 
   const feed=document.getElementById("feed");
-  // Remove post nodes (keep skeleton)
   [...feed.children].forEach(c=>{if(c.id!=="loadingSkeleton")c.remove();});
 
-  if(n===0){
+  if(n===0 && gapi.client.getToken()){
     const empty=document.createElement("div");
     empty.className="empty-state";
     empty.innerHTML=`<div class="empty-icon">◎</div><div>No research posts yet.<br>Publish your first update above — it'll sync to Google Drive.</div>`;
@@ -674,9 +683,7 @@ function buildPost(p,idx){
   const div=document.createElement("div");
   div.className="post";
 
-  // Restore blob URL from session cache
   let mediaURL=blobCache[p.id]||null;
-
   let mediaHTML="";
   if(mediaURL&&p.mediaType){
     if(p.mediaType.startsWith("image")) mediaHTML=`<div class="post-media"><img src="${mediaURL}" loading="lazy" alt="attachment"></div>`;
@@ -687,7 +694,6 @@ function buildPost(p,idx){
     mediaHTML=`<div style="margin-top:.75rem;font-size:.72rem;color:var(--muted)">📎 ${esc(p.mediaName)} <em>(session ended — re-attach to view)</em></div>`;
   }
 
-  const liked=p.liked||false, likes=p.likes||0;
   div.innerHTML=`
     <div class="post-header">
       <div class="post-meta">
@@ -703,124 +709,55 @@ function buildPost(p,idx){
     ${mediaHTML}
     <div style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem">
       <span class="drive-badge">☁ Google Drive</span>
-    </div>
-    <div class="post-footer">
-      <button class="like-btn${liked?" liked":""}" onclick="toggleLike(${idx},this)">
-        <span class="heart">${liked?"♥":"♡"}</span>
-        <span class="like-count">${likes}</span>
-      </button>
-      <span class="post-idx">#${idx+1}</span>
     </div>`;
   return div;
 }
 
 function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 
-/* ═══════════════════════════════════════════════════════════════
-   CREATE POST
-═══════════════════════════════════════════════════════════════ */
 async function createPost(){
+  if(!gapi.client.getToken()) { toast("Please Connect Google Drive first!", true); return; }
+  
   const text=document.getElementById("postText").value.trim();
   if(!text&&!uploadedFile){toast("Nothing to post!",true);return;}
 
   const btn=document.getElementById("postBtn");
-  btn.disabled=true;btn.textContent="⏳ Saving to Drive…";
+  btn.disabled=true;btn.textContent="⏳ Saving...";
 
   const now=new Date();
   const id="post_"+Date.now();
   const post={
     id,text:text||"",
     date:now.toLocaleDateString(),time:now.toLocaleTimeString(),
-    likes:0,liked:false,
     mediaName:uploadedFile?uploadedFile.name:null,
-    mediaType:uploadedFile?uploadedFile.type:null,
-    mediaURL:null // never persisted — blob only
+    mediaType:uploadedFile?uploadedFile.type:null
   };
 
-  // Stash blob in session cache
   if(uploadedFile) blobCache[id]=URL.createObjectURL(uploadedFile);
 
   const updated=[..._posts,post];
-
-  // Optimistic UI update
   renderAll(updated);
-  cacheSave(updated.map(p=>({...p,mediaURL:null})));
 
-  // Reset form
   document.getElementById("postText").value="";
   updateCharCount();
   uploadedFile=null;fileInput.value="";filePreview.classList.remove("show");
   btn.disabled=false;btn.textContent="▶ Publish to Drive";
 
-  // Async Drive save
-  try{
-    await savePostsToDrive(updated);
-    toast("☁ Post saved to Google Drive!");
-  }catch(e){
-    toast("Post saved locally. Drive sync failed: "+e.message,true);
-    setDriveStatus("error","Drive sync failed");
-  }
+  await saveToDrive(updated);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   DELETE
-═══════════════════════════════════════════════════════════════ */
 async function deletePost(idx){
+  if(!confirm("Delete this post?")) return;
   const updated=_posts.filter((_,i)=>i!==idx);
-  renderAll(updated);cacheSave(updated);
-  try{await savePostsToDrive(updated);toast("Post deleted from Drive.");}
-  catch(e){toast("Deleted locally. Drive: "+e.message,true);setDriveStatus("error","Drive sync failed");}
+  renderAll(updated);
+  await saveToDrive(updated);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   CLEAR ALL
-═══════════════════════════════════════════════════════════════ */
 async function clearAllPosts(){
   if(!confirm("Delete ALL posts from Google Drive? This cannot be undone."))return;
-  renderAll([]);cacheSave([]);
-  try{await savePostsToDrive([]);toast("All posts cleared from Drive.");}
-  catch(e){toast("Cleared locally. Drive: "+e.message,true);setDriveStatus("error","Drive sync failed");}
+  renderAll([]);
+  await saveToDrive([]);
 }
-
-/* ═══════════════════════════════════════════════════════════════
-   LIKE (local only for snappiness, synced to Drive async)
-═══════════════════════════════════════════════════════════════ */
-async function toggleLike(idx,btn){
-  const p=_posts[idx];
-  p.liked=!p.liked;p.likes=(p.likes||0)+(p.liked?1:-1);
-  btn.classList.toggle("liked",p.liked);
-  btn.querySelector(".heart").textContent=p.liked?"♥":"♡";
-  btn.querySelector(".like-count").textContent=p.likes;
-  cacheSave(_posts);
-  try{await savePostsToDrive(_posts);}catch{/* silent */}
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   INIT — load from Drive, fall back to cache while loading
-═══════════════════════════════════════════════════════════════ */
-(async()=>{
-  // Show cache immediately so page isn't blank
-  const cached=cacheLoad();
-  if(cached.length>0){renderAll(cached);document.getElementById("feedMeta").textContent="Loading from Google Drive…";}
-
-  try{
-    const posts=await loadPostsFromDrive();
-    renderAll(posts);
-    cacheSave(posts.map(p=>({...p,mediaURL:null})));
-    if(posts.length===0&&cached.length>0) toast("Drive has no posts — local cache cleared.",true);
-  }catch(e){
-    setDriveStatus("error","Drive unavailable");
-    // Stay on cached data
-    if(cached.length>0){
-      renderAll(cached);
-      document.getElementById("feedMeta").textContent=`Showing ${cached.length} cached post${cached.length>1?"s":""} (Drive offline)`;
-      toast("Drive unavailable — showing local cache.",true);
-    }else{
-      renderAll([]);
-      toast("Could not connect to Google Drive: "+e.message,true);
-    }
-  }
-})();
 </script>
 </body>
 </html>
