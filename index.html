@@ -1,138 +1,316 @@
+Here is the completely updated, comprehensive single-file HTML implementation.
+
+This version seamlessly integrates your actual CV data as a beautifully styled, structural replica of your uploaded `Naik_Ramchandar_CV.pdf` file. Additionally, it completely strips away manual comment lists and hardcoded like states, using a fully automated JavaScript engine to dynamically generate real-time timestamps and format your user handle properly across your updates.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramchandar Naik | Portfolio</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Enhanced inline styles for interactive comments and dynamic likes -->
+    <title>Ramchandar Naik | Portfolio & CV</title>
     <style>
+        /* BASE THEME & CONFIGURATION VARIABLES */
+        :root {
+            --bg: #f8f9fa;
+            --container-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-main: #212529;
+            --text-muted: #6c757d;
+            --border: #dee2e6;
+            --accent: #0056b3;
+            --cv-header-bg: #f1f3f5;
+            --tag-bg: #e9ecef;
+        }
+
+        [data-theme="dark"] {
+            --bg: #121212;
+            --container-bg: #1e1e1e;
+            --card-bg: #252525;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --border: #333333;
+            --accent: #375a7f;
+            --cv-header-bg: #2d2d2d;
+            --tag-bg: #3a3a3a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--container-bg);
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        /* THEME TOGGLE */
+        .theme-switch-wrapper {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px; width: 18px;
+            left: 4px; bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        .toggle-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* MASTER HEADERS */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 1.5rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+        }
+
+        section {
+            margin-bottom: 3.5rem;
+        }
+
+        section h2 {
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.35rem;
+        }
+
+        /* CV REPLICA STYLING SHEET */
+        .cv-document {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            background: var(--card-bg);
+        }
+
+        .cv-contact-strip {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .cv-contact-strip span {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .cv-section-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-bottom: 2px solid var(--text-main);
+            margin: 1.5rem 0 0.75rem 0;
+            padding-bottom: 0.15rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cv-row {
+            margin-bottom: 1rem;
+        }
+
+        .cv-row-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .cv-row-sub {
+            display: flex;
+            justify-content: space-between;
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .cv-document ul {
+            padding-left: 1.25rem;
+            margin-top: 0.25rem;
+        }
+
+        .cv-document li {
+            margin-bottom: 0.35rem;
+            font-size: 0.95rem;
+            text-align: justify;
+        }
+
+        /* ACADEMIC TABLE STYLE */
+        .cv-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .cv-table th, .cv-table td {
+            border: 1px solid var(--border);
+            padding: 0.6rem 0.75rem;
+            text-align: left;
+        }
+
+        .cv-table th {
+            background-color: var(--cv-header-bg);
+            font-weight: bold;
+        }
+
+        /* LIVE FEED ARCHITECTURE (NO LIKES/COMMENTS) */
         .feed-container {
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
-            margin-top: 1.5rem;
         }
+
         .post-card {
-            background: var(--card-bg, #ffffff);
-            border: 1px solid var(--border, #e1e8ed);
+            background: var(--card-bg);
+            border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 1.25rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            padding: 1.5rem;
         }
+
         .post-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 0.75rem;
         }
+
         .post-author {
             font-weight: bold;
-            color: var(--text-main, #14171a);
+            color: var(--accent);
         }
+
         .post-meta {
             font-size: 0.85rem;
-            color: var(--text-muted, #657786);
+            color: var(--text-muted);
         }
+
         .post-content {
             font-size: 1rem;
             line-height: 1.5;
-            margin-bottom: 1rem;
-            color: var(--text-main, #14171a);
         }
+
         .post-media {
-            margin-top: 0.75rem;
-            margin-bottom: 0.75rem;
+            margin-top: 1rem;
             border-radius: 8px;
             overflow: hidden;
-            border: 1px solid var(--border, #e1e8ed);
+            border: 1px solid var(--border);
         }
-        .post-actions {
-            display: flex;
-            gap: 1.5rem;
-            border-top: 1px solid var(--border, #e1e8ed);
-            border-bottom: 1px solid var(--border, #e1e8ed);
-            padding: 0.75rem 0;
-            font-size: 0.9rem;
-            color: var(--text-muted, #657786);
-        }
-        .action-item {
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            cursor: pointer;
-            user-select: none;
-            transition: transform 0.1s ease, color 0.2s;
-        }
-        .action-item:hover {
-            color: #e0245e;
-        }
-        .action-item:active {
-            transform: scale(1.15);
-        }
-        .action-item.liked {
-            color: #e0245e;
-            font-weight: bold;
-        }
-        
-        /* Interactive Comment Section Layout */
-        .comments-section {
-            margin-top: 0.75rem;
-            padding-top: 0.5rem;
-        }
-        .comments-list {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 0.75rem 0;
-            max-height: 150px;
-            overflow-y: auto;
-            font-size: 0.9rem;
-        }
-        .comment-item {
-            padding: 0.4rem 0.5rem;
-            border-radius: 6px;
-            background: rgba(0, 0, 0, 0.02);
-            margin-bottom: 0.35rem;
-            line-height: 1.4;
-        }
-        .comment-user {
-            font-weight: bold;
-            margin-right: 0.35rem;
-            color: var(--text-main, #14171a);
-        }
-        .comment-input-wrapper {
+
+        .tag-container {
             display: flex;
             gap: 0.5rem;
+            margin-top: 0.75rem;
         }
-        .comment-input {
-            flex: 1;
-            padding: 0.5rem 0.75rem;
-            border-radius: 20px;
-            border: 1px solid var(--border, #e1e8ed);
-            background: var(--bg, #f5f8fa);
-            color: var(--text-main, #14171a);
-            font-size: 0.85rem;
-            outline: none;
+
+        .tag {
+            background: var(--tag-bg);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
         }
-        .comment-input:focus {
-            border-color: var(--accent, #0076ff);
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
+            color: var(--text-muted);
         }
-        .comment-submit-btn {
-            background: var(--accent, #0076ff);
-            color: white;
-            border: none;
-            padding: 0.4rem 1rem;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: bold;
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
         }
-        .comment-submit-btn:hover {
-            opacity: 0.9;
+
+        footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
+
     <div class="theme-switch-wrapper">
         <label class="theme-switch" for="checkbox">
             <input type="checkbox" id="checkbox" />
@@ -142,129 +320,194 @@
     </div>
 
     <div class="container">
-        <!-- HEADER SECTION -->
         <header>
-            <h1>Ramchandar Naik</h1>
-            <p class="subtitle">Physics, Mathematics and Philosophy and Truth</p>
+            <h1>M Ramchandar Naik</h1>
+            <p class="subtitle">Computational & Astroparticle Physics Researcher</p>
         </header>
 
         <main>
-            <!-- SECTION 1: BIOGRAPHY -->
-            <section class="card" id="about">
-                <h2>About Me</h2>
-                <p>
-                    Passionate about solving complex physical problems through scientific computing, 
-                    theoretical modeling, high-performance architectures, and data analysis.
-                </p>
-            </section>
+            <section id="cv-section">
+                <h2>Curriculum Vitae</h2>
+                <div class="cv-document">
+                    <div style="text-align: center; font-weight: bold; font-size: 1.4rem;">M RAMCHANDAR NAIK</div>
+                    <div class="cv-contact-strip">
+                        <span>✉️ ramchandarnaik1@gmail.com</span>
+                        <span>📞 +91 6302987021</span>
+                        <span>📅 May 19, 2026</span>
+                    </div>
 
-            <!-- SECTION 2: CURRICULUM VITAE & RESEARCH -->
-            <section id="projects">
-                <h2>Curriculum Vitae & Research</h2>
-                <div class="project-grid">
-                    <!-- CV Upload Card -->
-                    <article class="project-card-main" style="border: 2px solid var(--accent, #0076ff); padding: 1.25rem; border-radius: 12px; background: var(--card-bg, #fff);">
-                        <h3>Curriculum Vitae</h3>
-                        <p>View or download my full academic and professional CV outlining my qualifications, research background, and technical expertise.</p>
-                        <a href="ramchandarnaik_cv.pdf" class="media-btn" target="_blank" style="display: inline-block; font-weight: bold; margin-top: 0.5rem;">📄 View My CV (PDF)</a>
-                    </article>
+                    <div class="cv-section-title">Profile</div>
+                    <p style="font-size: 0.95rem; text-align: justify; margin-bottom: 1rem;">
+                        MSc Physics graduate from IIT Bombay with research experience in astroparticle physics, detector-data analysis, and high-energy physics. Worked on IceCube-Gen2 at KIT and Belle II experiments. Interested in cosmic-ray physics, particle detectors, and scientific computing for astroparticle physics.
+                    </p>
 
-                    <!-- Scientific Programming Card -->
-                    <article class="project-card-main" style="padding: 1.25rem; border-radius: 12px; background: var(--card-bg, #fff); border: 1px solid var(--border, #e1e8ed);">
-                        <h3>Scientific Programming</h3>
-                        <p>Developing automated architectures and script configurations using custom deep learning structures.</p>
-                        <div class="tag-container" style="margin-top: 0.5rem;">
-                            <span class="tag">Python</span>
-                            <span class="tag">Bash</span>
+                    <div class="cv-section-title">Education</div>
+                    <table class="cv-table">
+                        <thead>
+                            <tr>
+                                <th>Qualification</th>
+                                <th>University</th>
+                                <th>Year</th>
+                                <th>GPA/10</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>MSc</strong></td>
+                                <td>IIT Bombay</td>
+                                <td>2025</td>
+                                <td>7.15</td>
+                            </tr>
+                            <tr>
+                                <td><strong>BSc</strong></td>
+                                <td>University of Hyderabad</td>
+                                <td>2023</td>
+                                <td>9.26</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="cv-section-title">Internships</div>
+                    
+                    <div class="cv-row">
+                        <div class="cv-row-header">
+                            <span>Karlsruhe Institute of Technology (KIT), Germany</span>
+                            <span>May 2024 - Jul 2024</span>
                         </div>
-                    </article>
+                        <div class="cv-row-sub">
+                            <span>Supervisor: Prof. Andreas Haungs</span>
+                            <span>Project: Surface Array Enhancement for IceCube-Gen2</span>
+                        </div>
+                        <ul>
+                            <li>Contributed to the Surface Array Enhancement, aimed at improving cosmic-ray detection in the energy range from 100 TeV to 1 EeV.</li>
+                            <li>Investigated temperature-dependent signal loss in scintillation detector pixel rates associated with the TAXI data acquisition (DAQ).</li>
+                            <li>Developed Python scripts for automated multi-day data analysis and visualization of pixel-rate and temperature correlations.</li>
+                            <li>Performed comparative analyses using data from IceCube, Pierre Auger Observatory, and Telescope Array (TA) experiments.</li>
+                        </ul>
+                    </div>
+
+                    <div class="cv-row">
+                        <div class="cv-row-header">
+                            <span>IIT Madras, India</span>
+                            <span>May 2023 - Jul 2023</span>
+                        </div>
+                        <div class="cv-row-sub">
+                            <span>Supervisor: Prof. Jim Libby</span>
+                            <span>Project: Study of decay channel B⁺ → D⁰ π⁺ π⁻ π⁺ (Belle II)</span>
+                        </div>
+                        <ul>
+                            <li>Performed Monte Carlo analysis of the decay channel B⁺ → D⁰ π⁺ π⁻ π⁺ within the Belle II experiment.</li>
+                            <li>Applied event-selection criteria and analyzed kinematic observables relevant to signal reconstruction and background suppression.</li>
+                            <li>Measured the signal yield of the decay through fits to reconstructed distributions and gained experience in collider-data analysis.</li>
+                        </ul>
+                    </div>
+
+                    <div class="cv-section-title">Projects</div>
+
+                    <div class="cv-row">
+                        <div class="cv-row-header">
+                            <span>IISc Bangalore, India</span>
+                            <span>Aug 2025 - May 2026</span>
+                        </div>
+                        <div class="cv-row-sub">
+                            <span>Supervisor: Prof. Prabal K. Maiti</span>
+                            <span>Project: Molecular Dynamics Simulations of DNA Charge Transport</span>
+                        </div>
+                        <ul>
+                            <li>Performed Molecular Dynamics (MD) simulations of DNA molecules using GROMACS to investigate charge transport properties and electronic coupling between the base pairs.</li>
+                        </ul>
+                    </div>
+
+                    <div class="cv-row">
+                        <div class="cv-row-header">
+                            <span>IIT Bombay, India</span>
+                            <span>Aug 2024 - May 2025</span>
+                        </div>
+                        <div class="cv-row-sub">
+                            <span>Master's Project under Prof. P. Ramadevi</span>
+                            <span>Project: Exact Solutions and Causal Structure of Black-Hole Spacetimes</span>
+                        </div>
+                        <ul>
+                            <li>Studied exact solutions to Einstein's field equations, including charged and non-flat black-hole geometries.</li>
+                            <li>Analyzed horizon structure, coordinate singularities, and causal properties of curved spacetime backgrounds.</li>
+                        </ul>
+                    </div>
+
+                    <div class="cv-row">
+                        <div class="cv-row-header">
+                            <span>University of Hyderabad, India</span>
+                            <span>Dec 2021 - Feb 2022</span>
+                        </div>
+                        <div class="cv-row-sub">
+                            <span>Supervisor: Prof. E. Harikumar</span>
+                            <span>Project: Lorentz Transformation and Thomas Precession</span>
+                        </div>
+                        <ul>
+                            <li>Derived Thomas Precession frequency by composing non-collinear infinitesimal Lorentz boosts resulting rotation in the SO(3,1) group.</li>
+                        </ul>
+                    </div>
+
+                    <div class="cv-section-title">Courses</div>
+                    <p style="font-size: 0.95rem; color: var(--text-main);">
+                        Elementary Particle Physics, General Relativity, Quantum Field Theory, Group Theory, Quantum Mechanics, Classical Mechanics, Electromagnetic Theory, Statistical Physics, Mathematical Physics.
+                    </p>
+
+                    <div class="cv-section-title">Certification</div>
+                    <ul>
+                        <li>Summer Fellowship Program 2023 (IIT Madras)</li>
+                    </ul>
+
+                    <div class="cv-section-title">Skills</div>
+                    <ul>
+                        <li><strong>Programming:</strong> Python, Bash.</li>
+                        <li><strong>Scientific Libraries:</strong> NumPy, Matplotlib, SciPy, Pandas.</li>
+                        <li><strong>Scientific Computing:</strong> Detector-data analysis, Molecular dynamics simulations.</li>
+                        <li><strong>Tools:</strong> LaTeX, Linux, Vim, GROMACS.</li>
+                        <li><strong>Languages:</strong> English, Hindi, Telugu, German (Beginner).</li>
+                    </ul>
                 </div>
             </section>
 
-            <!-- SECTION 3: RECENT UPDATES & FEED -->
-            <section class="card" id="feed">
+            <section id="updates-feed">
                 <h2>Recent Updates</h2>
-                <p>Latest thoughts, milestones, and media snippets.</p>
-                
                 <div class="feed-container">
                     
-                    <!-- POST 1: TEXT ONLY -->
-                    <div class="post-card" data-post-id="1">
+                    <div class="post-card">
                         <div class="post-header">
                             <span class="post-author">@rom</span>
-                            <span class="post-meta">May 24, 2026 • 09:15 AM</span>
+                            <span class="post-meta auto-date" data-offset-days="0"></span>
                         </div>
                         <div class="post-content">
-                            Spent the morning restructuring my portfolio layout and organizing my physics research artifacts. Clean code, clear mind! 💻✨
-                        </div>
-                        <div class="post-actions">
-                            <div class="action-item like-btn">❤️ <span class="like-count">24</span> Likes</div>
-                            <div class="action-item toggle-comments-btn">💬 <span class="comment-count">1</span> Comments</div>
-                        </div>
-                        <div class="comments-section">
-                            <div class="comments-list">
-                                <div class="comment-item"><span class="comment-user">@visitor_1:</span>Looks very clean and organized!</div>
-                            </div>
-                            <div class="comment-input-wrapper">
-                                <input type="text" class="comment-input" placeholder="Write a comment...">
-                                <button class="comment-submit-btn">Post</button>
-                            </div>
+                            Synchronized the portfolio codebase with my verified academic curriculum details directly from my master CV file. Clean compilation completed! 💻
                         </div>
                     </div>
 
-                    <!-- POST 2: VIDEO POST -->
-                    <div class="post-card" data-post-id="2">
+                    <div class="post-card">
                         <div class="post-header">
                             <span class="post-author">@rom</span>
-                            <span class="post-meta">May 22, 2026 • 04:30 PM</span>
+                            <span class="post-meta auto-date" data-offset-days="2"></span>
                         </div>
                         <div class="post-content">
-                            Just finished rendering the presentation recording for my latest simulation pipeline run. Performance optimizations are looking incredible. Check it out!
+                            Analysis presentation recording run complete. Validating structural behaviors and code metrics across our tracking modules.
                             <div class="post-media">
                                 <video controls width="100%" style="display: block;">
                                     <source src="assets/trajectory-render.mp4" type="video/mp4">
                                 </video>
                             </div>
                         </div>
-                        <div class="post-actions">
-                            <div class="action-item like-btn">❤️ <span class="like-count">42</span> Likes</div>
-                            <div class="action-item toggle-comments-btn">💬 <span class="comment-count">2</span> Comments</div>
-                        </div>
-                        <div class="comments-section">
-                            <div class="comments-list">
-                                <div class="comment-item"><span class="comment-user">@peer_reviewer:</span>What framework did you compile this tracking loop with?</div>
-                                <div class="comment-item"><span class="comment-user">@x:</span>Awesome speedup metrics man!</div>
-                            </div>
-                            <div class="comment-input-wrapper">
-                                <input type="text" class="comment-input" placeholder="Write a comment...">
-                                <button class="comment-submit-btn">Post</button>
-                            </div>
-                        </div>
                     </div>
 
-                    <!-- POST 3: AUDIO POST -->
-                    <div class="post-card" data-post-id="3">
+                    <div class="post-card">
                         <div class="post-header">
                             <span class="post-author">@rom</span>
-                            <span class="post-meta">May 18, 2026 • 11:05 AM</span>
+                            <span class="post-meta auto-date" data-offset-days="6"></span>
                         </div>
                         <div class="post-content">
-                            🎙️ Short audio breakdown discussing the framework optimizations for scientific computing data architectures. 
-                            <div class="post-media" style="padding: 0.5rem; background: var(--bg, #f5f8fa);">
+                            🎙️ Quick data architecture audio briefing on computational physics analysis methodologies.
+                            <div class="post-media" style="padding: 0.5rem; background: var(--bg);">
                                 <audio controls style="width: 100%; display: block;">
                                     <source src="assets/presentation-audio.mp3" type="audio/mpeg">
                                 </audio>
-                            </div>
-                        </div>
-                        <div class="post-actions">
-                            <div class="action-item like-btn">❤️ <span class="like-count">18</span> Likes</div>
-                            <div class="action-item toggle-comments-btn">💬 <span class="comment-count">0</span> Comments</div>
-                        </div>
-                        <div class="comments-section">
-                            <div class="comments-list"></div>
-                            <div class="comment-input-wrapper">
-                                <input type="text" class="comment-input" placeholder="Write a comment...">
-                                <button class="comment-submit-btn">Post</button>
                             </div>
                         </div>
                     </div>
@@ -278,14 +521,16 @@
         </footer>
     </div>
 
-    <!-- Theme Controller Script -->
     <script>
+        // Theme Switching Controller
         const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
         const currentTheme = localStorage.getItem('theme');
+        
         if (currentTheme) {
             document.documentElement.setAttribute('data-theme', currentTheme);
             if (currentTheme === 'light') toggleSwitch.checked = true;
         }
+        
         function switchTheme(e) {
             if (e.target.checked) {
                 document.documentElement.setAttribute('data-theme', 'light');
@@ -296,70 +541,33 @@
             }    
         }
         toggleSwitch.addEventListener('change', switchTheme, false);
-    </script>
 
-    <!-- Social Engine Interaction Script -->
-    <script>
+        // Automated Dynamic Time/Date Generator Engine
         document.addEventListener('DOMContentLoaded', () => {
-            // Like Handler Setup
-            document.querySelectorAll('.like-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const countEl = btn.querySelector('.like-count');
-                    let currentLikes = parseInt(countEl.textContent, 10);
-                    
-                    if (btn.classList.contains('liked')) {
-                        btn.classList.remove('liked');
-                        countEl.textContent = currentLikes - 1;
-                    } else {
-                        btn.classList.add('liked');
-                        countEl.textContent = currentLikes + 1;
-                    }
-                });
-            });
-
-            // Comment Posting Setup Function
-            const addComment = (cardEl) => {
-                const inputEl = cardEl.querySelector('.comment-input');
-                const text = inputEl.value.trim();
-                if (!text) return;
-
-                const listEl = cardEl.querySelector('.comments-list');
-                const countEl = cardEl.querySelector('.comment-count');
-
-                // Build new comment node
-                const commentDiv = document.createElement('div');
-                commentDiv.className = 'comment-item';
-                commentDiv.innerHTML = `<span class="comment-user">@you:</span>${escapeHTML(text)}`;
+            const dateElements = document.querySelectorAll('.auto-date');
+            
+            dateElements.forEach(el => {
+                const offset = parseInt(el.getAttribute('data-offset-days'), 10) || 0;
+                const postDate = new Date();
                 
-                listEl.appendChild(commentDiv);
+                // Subtract offsets to create realistic chronology relative to current system execution
+                postDate.setDate(postDate.getDate() - offset);
                 
-                // Update total comments indicator metric
-                let currentComments = parseInt(countEl.textContent, 10);
-                countEl.textContent = currentComments + 1;
-
-                // Reset field and scroll to tracking bottom
-                inputEl.value = '';
-                listEl.scrollTop = listEl.scrollHeight;
-            };
-
-            // Hook Event Listeners for Comments
-            document.querySelectorAll('.post-card').forEach(card => {
-                const submitBtn = card.querySelector('.comment-submit-btn');
-                const inputField = card.querySelector('.comment-input');
-
-                submitBtn.addEventListener('click', () => addComment(card));
-                inputField.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') addComment(card);
-                });
+                // Standardize layout options mimicking classic tweet timestamps
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                const formattedDate = postDate.toLocaleDateString('en-US', options);
+                
+                let hours = postDate.getHours();
+                const minutes = postDate.getMinutes().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12; // Handle midnight window 0 value
+                
+                el.textContent = `${formattedDate} • ${hours}:${minutes} ${ampm}`;
             });
-
-            // Helper to clean output text entries
-            function escapeHTML(str) {
-                return str.replace(/[&<>'"]/g, 
-                    tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-                );
-            }
         });
     </script>
 </body>
 </html>
+
+```
